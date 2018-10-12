@@ -1,0 +1,20 @@
+{
+  "name": "snakee",
+  "version": "1.0.0",
+  "description": "[MIT](https://github.com/Enc-EE/snakee/blob/master/LICENSE)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Enc-EE/snakee.git"
+  },
+  "keywords": [],
+  "author": "Eric Eichhorn",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Enc-EE/snakee/issues"
+  },
+  "homepage": "https://github.com/Enc-EE/snakee#readme"
+}
