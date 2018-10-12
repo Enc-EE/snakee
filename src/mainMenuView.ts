@@ -3,16 +3,34 @@ import { Controller, Signals, ControllerType } from "./enc/controller";
 import { KeyboardControls } from "./enc/keyboardControls";
 import { GamepadScanner } from "./enc/gamepadScanner";
 import { GamepadControls } from "./enc/gamepadControls";
+import controls_gamepad from "./assets/controls_gamepad.png";
+import controls_keyboard from "./assets/controls_keyboard.png";
 
 export class MainMenuView extends View {
     private selectedOption: number;
     private options: string[] = [];
     private controllers: Controller[] = [];
+    controls_gamepad_image: HTMLImageElement;
+    controls_keyboard_image: HTMLImageElement;
 
     constructor() {
         super();
-        this.options = ["Start Game", "Controls"];
+        this.options = ["Start Game", "Show / Hide Controls"];
         this.selectedOption = 0;
+
+        this.controls_gamepad_image = new Image();
+        this.controls_gamepad_image.src = controls_gamepad;
+        this.controls_keyboard_image = new Image();
+        this.controls_keyboard_image.src = controls_keyboard;
+
+        this.addAnimation((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+            let newWidth = width / 3;
+            let newHeight = newWidth / this.controls_gamepad_image.naturalWidth * this.controls_gamepad_image.naturalHeight;
+            ctx.drawImage(this.controls_gamepad_image, newWidth - newWidth / 2, height * 3 / 4 - newHeight / 2, newWidth, newHeight);
+            newHeight = newWidth / this.controls_keyboard_image.naturalWidth * this.controls_keyboard_image.naturalHeight;
+            ctx.drawImage(this.controls_keyboard_image, newWidth * 2 - newWidth / 2, height * 3 / 4 - newHeight / 2, newWidth, newHeight);
+        });
+
         this.addAnimation(this.drawOptions);
         this.addAnimation(this.drawControllers);
 

@@ -11,7 +11,7 @@ module.exports = {
     plugins: [
         new CleanWebpackPlugin(['dist']),
         new HtmlWebpackPlugin({
-            title: 'Blade'
+            title: 'Snakee'
         })
     ],
     output: {
