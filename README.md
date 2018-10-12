@@ -1,11 +1,9 @@
-## Project Setup (for further projects)
+## Project Setup
 
-1. Create GitHub Repo with MIT License
-2. `git clone`
-3. `npm init`
-    - author: Eric Eichhorn
-    - license: MIT
+Clone the project and run `npm install`.
+
+After that you can start a dev server with `npm start` or build the app into the /dist folder with `npm build`.
 
 ## License
 
-[MIT](https://github.com/Enc-EE/snakee/blob/master/LICENSE)
+MIT

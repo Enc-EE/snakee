@@ -1,20 +1,24 @@
 {
   "name": "snakee",
   "version": "1.0.0",
-  "description": "[MIT](https://github.com/Enc-EE/snakee/blob/master/LICENSE)",
-  "main": "index.js",
+  "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "webpack-dev-server"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Enc-EE/snakee.git"
-  },
-  "keywords": [],
   "author": "Eric Eichhorn",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Enc-EE/snakee/issues"
-  },
-  "homepage": "https://github.com/Enc-EE/snakee#readme"
+  "devDependencies": {
+    "clean-webpack-plugin": "^0.1.19",
+    "css-loader": "^1.0.0",
+    "file-loader": "^2.0.0",
+    "html-webpack-plugin": "^3.2.0",
+    "style-loader": "^0.23.1",
+    "ts-loader": "^5.2.1",
+    "typescript": "^3.1.3",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9"
+  }
 }
