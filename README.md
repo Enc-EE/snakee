@@ -3,7 +3,7 @@
 This project is part of my One Game a Month Challenge.
 See [http://www.onegameamonth.com/ee_enc](http://www.onegameamonth.com/ee_enc)
 
-You can test the game at [https://enc-ee.github.io/snakee/dist/](https://enc-ee.github.io/snakee/dist/);
+You can test the game at [https://enc-ee.github.io/snakee/dist/](https://enc-ee.github.io/snakee/dist/).
 
 ## Project Setup
 
