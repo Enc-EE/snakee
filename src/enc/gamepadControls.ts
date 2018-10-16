@@ -47,6 +47,7 @@ export class GamepadControls implements Controller {
         var now = Date.now();
 
         this.checkSignal(this.start, Signals.start, now);
+        this.checkSignal(this.a, Signals.a, now);
         this.checkSignal(this.yAxes < -0.3, Signals.up, now);
         this.checkSignal(this.yAxes > 0.3, Signals.down, now);
         this.checkSignal(this.xAxes < -0.3, Signals.left, now);

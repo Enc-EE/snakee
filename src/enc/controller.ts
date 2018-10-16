@@ -5,7 +5,8 @@ export enum Signals {
     left = "left",
     up = "up",
     right = "right",
-    down = "down"
+    down = "down",
+    a = "a"
 }
 
 export enum ControllerType {

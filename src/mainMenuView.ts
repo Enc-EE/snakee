@@ -13,10 +13,13 @@ export class MainMenuView extends View {
     controls_gamepad_image: HTMLImageElement;
     controls_keyboard_image: HTMLImageElement;
 
+    private showControls: boolean;
+
     constructor() {
         super();
         this.options = ["Start Game", "Show / Hide Controls"];
         this.selectedOption = 0;
+        this.showControls = true;
 
         this.controls_gamepad_image = new Image();
         this.controls_gamepad_image.src = controls_gamepad;
@@ -24,11 +27,13 @@ export class MainMenuView extends View {
         this.controls_keyboard_image.src = controls_keyboard;
 
         this.addAnimation((ctx: CanvasRenderingContext2D, width: number, height: number) => {
-            let newWidth = width / 3;
-            let newHeight = newWidth / this.controls_gamepad_image.naturalWidth * this.controls_gamepad_image.naturalHeight;
-            ctx.drawImage(this.controls_gamepad_image, newWidth - newWidth / 2, height * 3 / 4 - newHeight / 2, newWidth, newHeight);
-            newHeight = newWidth / this.controls_keyboard_image.naturalWidth * this.controls_keyboard_image.naturalHeight;
-            ctx.drawImage(this.controls_keyboard_image, newWidth * 2 - newWidth / 2, height * 3 / 4 - newHeight / 2, newWidth, newHeight);
+            if (this.showControls) {
+                let newWidth = width / 3;
+                let newHeight = newWidth / this.controls_gamepad_image.naturalWidth * this.controls_gamepad_image.naturalHeight;
+                ctx.drawImage(this.controls_gamepad_image, newWidth - newWidth / 2, height * 3 / 4 - newHeight / 2, newWidth, newHeight);
+                newHeight = newWidth / this.controls_keyboard_image.naturalWidth * this.controls_keyboard_image.naturalHeight;
+                ctx.drawImage(this.controls_keyboard_image, newWidth * 2 - newWidth / 2, height * 3 / 4 - newHeight / 2, newWidth, newHeight);
+            }
         });
 
         this.addAnimation(this.drawOptions);
@@ -40,12 +45,15 @@ export class MainMenuView extends View {
         });
         gamepadScanner.start();
 
-        var keyboard = new KeyboardControls("arrows", 38, 37, 40, 39, 187);
+        var keyboard = new KeyboardControls("arrows", 38, 37, 40, 39, 32);
         this.addController(keyboard);
     }
 
     public drawOptions = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
 
+        if (this.controllers.length <= 0) {
+            return;
+        }
         const fontSize = 22;
         const margin = 5;
         const optionsHeight = (fontSize + margin * 2) * this.options.length;
@@ -67,8 +75,8 @@ export class MainMenuView extends View {
     }
 
     public drawControllers = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-        var margin = 5;
-        var controllerWidth = 30;
+        var margin = 15;
+        var controllerWidth = 60;
         var totalWidth = margin + this.controllers.length * (controllerWidth + margin)
         var startX = width / 2 - totalWidth / 2
         for (let i = 0; i < this.controllers.length; i++) {
@@ -77,11 +85,15 @@ export class MainMenuView extends View {
             switch (element.type) {
                 case ControllerType.gamepad:
                     ctx.fillStyle = "red";
-                    ctx.fillRect(x, height / 4, 20, 20);
+                    ctx.font = '60px FontAwesome';
+                    ctx.fillText('\uf11b', x, height / 4);
+                    // ctx.fillRect(x, height / 4, 20, 20);
                     break;
                 case ControllerType.keyboard:
                     ctx.fillStyle = "green";
-                    ctx.fillRect(x, height / 4, 20, 20);
+                    ctx.font = '60px FontAwesome';
+                    ctx.fillText('\uf11c', x, height / 4);
+                    // ctx.fillRect(x, height / 4, 20, 20);
                     break;
                 default:
                     break;
@@ -117,6 +129,15 @@ export class MainMenuView extends View {
                     this.selectedOption--;
                     if (this.selectedOption < 0) {
                         this.selectedOption = this.options.length - 1;
+                    }
+                    break;
+                case Signals.a:
+                    switch (this.selectedOption) {
+                        case 0:
+                            break;
+                        case 1:
+                            this.showControls = !this.showControls;
+                            break;
                     }
                     break;
             }

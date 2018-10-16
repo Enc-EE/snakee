@@ -40,6 +40,7 @@ export class KeyboardControls implements Controller {
             }
             if (event.keyCode == a) {
                 this.a = true;
+                this.signal.dispatchEvent(this, Signals.a);
             }
         });
 
