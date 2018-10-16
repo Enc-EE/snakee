@@ -48,10 +48,10 @@ export class GamepadControls implements Controller {
 
         this.checkSignal(this.start, Signals.start, now);
         this.checkSignal(this.a, Signals.a, now);
-        this.checkSignal(this.yAxes < -0.3, Signals.up, now);
-        this.checkSignal(this.yAxes > 0.3, Signals.down, now);
-        this.checkSignal(this.xAxes < -0.3, Signals.left, now);
-        this.checkSignal(this.xAxes > 0.3, Signals.right, now);
+        this.checkSignal(this.yAxes < -0.5, Signals.up, now);
+        this.checkSignal(this.yAxes > 0.5, Signals.down, now);
+        this.checkSignal(this.xAxes < -0.5, Signals.left, now);
+        this.checkSignal(this.xAxes > 0.5, Signals.right, now);
     }
 
     private checkSignal = (isPressed: boolean, signal: Signals, now: number) => {

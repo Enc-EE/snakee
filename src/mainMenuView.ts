@@ -9,13 +9,14 @@ import controls_keyboard from "./assets/controls_keyboard.png";
 export class MainMenuView extends View {
     private selectedOption: number;
     private options: string[] = [];
-    private controllers: Controller[] = [];
+    public controllers: Controller[] = [];
     controls_gamepad_image: HTMLImageElement;
     controls_keyboard_image: HTMLImageElement;
 
     private showControls: boolean;
+    gamepadScanner: GamepadScanner;
 
-    constructor() {
+    constructor(private start: () => void) {
         super();
         this.options = ["Start Game", "Show / Hide Controls"];
         this.selectedOption = 0;
@@ -39,11 +40,11 @@ export class MainMenuView extends View {
         this.addAnimation(this.drawOptions);
         this.addAnimation(this.drawControllers);
 
-        var gamepadScanner = new GamepadScanner();
-        gamepadScanner.scannedGamepad.addEventListener((gamepad: Gamepad) => {
+        this.gamepadScanner = new GamepadScanner();
+        this.gamepadScanner.scannedGamepad.addEventListener((gamepad: Gamepad) => {
             this.addController(new GamepadControls(gamepad.index.toString(), gamepad.index));
         });
-        gamepadScanner.start();
+        this.gamepadScanner.start();
 
         var keyboard = new KeyboardControls("arrows", 38, 37, 40, 39, 32);
         this.addController(keyboard);
@@ -134,6 +135,8 @@ export class MainMenuView extends View {
                 case Signals.a:
                     switch (this.selectedOption) {
                         case 0:
+                            this.gamepadScanner.stop();
+                            this.start();
                             break;
                         case 1:
                             this.showControls = !this.showControls;
