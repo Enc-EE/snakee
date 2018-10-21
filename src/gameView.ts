@@ -10,7 +10,7 @@ export class GameView extends View {
     fieldSize: number;
     numberOfBlocksY: number;
     numberOfBlocksX: number;
-    items: { x: number, y: number }[] = [];
+    items: { x: number, y: number, weight: number, drawStart: number }[] = [];
     itemSpawnerDelay: number;
     currentItemSpawnDelay: number;
     maxItems: number;
@@ -60,7 +60,7 @@ export class GameView extends View {
                         }
                         maxIterations--;
                         if (foundItem) {
-                            this.items.push({ x: itemX, y: itemY });
+                            this.items.push({ x: itemX, y: itemY, weight: (Math.floor(Math.random() * 2) + 1) / 2, drawStart: Math.random() * Math.PI * 2 });
                         }
                     } while (!foundItem && maxIterations > 0);
                 }
@@ -88,8 +88,19 @@ export class GameView extends View {
                         }
                     }
                 }
+                var collectedItemIndices = [];
+                for (let j = 0; j < this.items.length; j++) {
+                    const item = this.items[j];
+                    if (item.x == snake1.headPart.x && item.y == snake1.headPart.y) {
+                        collectedItemIndices.push(j);
+                        snake1.collected.dispatchEvent(item.weight);
+                    }
+                }
+                for (let i = 0; i < collectedItemIndices.length; i++) {
+                    const itemIndex = collectedItemIndices[i];
+                    this.items.splice(itemIndex, 1);
+                }
             }
-
         }
     };
 
@@ -101,7 +112,7 @@ export class GameView extends View {
             const item = this.items[i];
             ctx.fillStyle = 'black';
             ctx.beginPath();
-            ctx.arc(item.x * fieldSizeX + fieldSizeX / 2, item.y * fieldSizeY + fieldSizeY / 2, fieldSizeX / 3, 0, Math.PI * 2);
+            ctx.arc(item.x * fieldSizeX + fieldSizeX / 2, item.y * fieldSizeY + fieldSizeY / 2, fieldSizeX / 3, item.drawStart, item.drawStart + Math.PI * 2 * item.weight);
             ctx.fill();
         }
 

@@ -1,6 +1,6 @@
 import { Animatable } from "./enc/animation";
 import { Controller, Signals } from "./enc/controller";
-import { EEvent } from "./enc/eEvent";
+import { EEvent, EEventT } from "./enc/eEvent";
 
 enum Direction {
     up,
@@ -12,11 +12,13 @@ enum Direction {
 export class Snake implements Animatable {
 
     public parts: { x: number, y: number }[] = [];
+    private points: number;
 
     private direction: Direction;
     private nextDirection: Direction
     private color: string;
-    iMDone: EEvent;
+    public iMDone: EEvent;
+    public collected: EEventT<number>;
     private isDone: boolean;
 
 
@@ -25,22 +27,29 @@ export class Snake implements Animatable {
     }
 
 
+
     constructor(private fieldSize: number, private controller: Controller, private playerNumber: number) {
         this.direction = Direction.right;
+        this.points = 0;
         this.nextDirection = this.direction;
         this.isDone = false;
-        this.color = "hsl(" + playerNumber * 360 + ",100%, 40%)"
+        this.color = "hsl(" + playerNumber * 360 + ",100%, 30%)"
         for (let i = 0; i < 7; i++) {
             this.parts.push({ x: 3 + i, y: 1 + Math.round(playerNumber * 20) });
         }
         controller.signal.addEventListener(this.controllerSignal)
 
         this.iMDone = new EEvent();
+        this.collected = new EEventT<number>();
+        this.collected.addEventListener(this.collectedSomething);
         this.iMDone.addEventListener(this.finish)
     }
 
+    private collectedSomething = (weight: number) => {
+        this.points += weight * 2;
+    };
+
     private finish = () => {
-        this.color = "hsl(" + this.playerNumber * 360 + ",100%, 80%)"
         this.isDone = true;
     }
 
@@ -95,16 +104,28 @@ export class Snake implements Animatable {
     }
 
     public draw = (ctx: CanvasRenderingContext2D, width?: number, height?: number) => {
-
         const numberOfBlocksX = (this.fieldSize * 30)
         const fieldSizeX = width / numberOfBlocksX;
         let numberOfBlocksY = height / fieldSizeX;
         numberOfBlocksY = Math.ceil(numberOfBlocksY)
         const fieldSizeY = height / numberOfBlocksY;
+
+        var colorGradient = 30 / this.parts.length;
+        ctx.fillStyle = this.color;
         for (let i = 0; i < this.parts.length; i++) {
+            if (this.isDone) {
+                ctx.fillStyle = "hsl(" + this.playerNumber * 360 + ",100%, 30%)"
+            } else {
+                ctx.fillStyle = "hsl(" + this.playerNumber * 360 + ",100%, " + (30 + colorGradient * i) + "%)"
+            }
             const part = this.parts[i];
-            ctx.fillStyle = this.color;
             ctx.fillRect(part.x * fieldSizeX, part.y * fieldSizeY, fieldSizeX, fieldSizeY);
         }
+
+        ctx.textAlign = "start"; // start / left / center / right / end
+        ctx.textBaseline = "top" // bottom / alphabetic / middle / hanging / top
+        ctx.font = "60px sans-serif";
+        ctx.fillStyle = "hsl(" + this.playerNumber * 360 + ",100%, 50%)"
+        ctx.fillText(this.points.toString(), width * this.playerNumber, 10)
     }
 }
