@@ -81,20 +81,17 @@ export class MainMenuView extends View {
         var totalWidth = margin + this.controllers.length * (controllerWidth + margin)
         var startX = width / 2 - totalWidth / 2
         for (let i = 0; i < this.controllers.length; i++) {
+            ctx.fillStyle = "hsl(" + i / this.controllers.length * 360 + ",100%, 40%)";
             const element = this.controllers[i];
             var x = startX + margin + (margin + controllerWidth) * i;
             switch (element.type) {
                 case ControllerType.gamepad:
-                    ctx.fillStyle = "red";
                     ctx.font = '60px FontAwesome';
                     ctx.fillText('\uf11b', x, height / 4);
-                    // ctx.fillRect(x, height / 4, 20, 20);
                     break;
                 case ControllerType.keyboard:
-                    ctx.fillStyle = "green";
                     ctx.font = '60px FontAwesome';
                     ctx.fillText('\uf11c', x, height / 4);
-                    // ctx.fillRect(x, height / 4, 20, 20);
                     break;
                 default:
                     break;

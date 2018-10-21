@@ -1,3 +1,32 @@
+export class EEvent {
+    private listeners: (() => void)[] = [];
+
+    public addEventListener = (listener: () => void) => {
+        // validation
+        if (!listener || this.listeners.indexOf(listener) >= 0) {
+            throw "listener already added";
+        }
+
+        this.listeners.push(listener);
+    }
+
+    public dispatchEvent = () => {
+        for (let i = 0; i < this.listeners.length; i++) {
+            const event = this.listeners[i];
+            event();
+        }
+    }
+
+    public removeEventListener = (listener: () => void) => {
+        // validation
+        if (!listener || this.listeners.indexOf(listener) < 0) {
+            throw "listener not found";
+        }
+
+        this.listeners.splice(this.listeners.indexOf(listener), 1);
+    }
+}
+
 export class EEventT<T> {
     private listeners: ((arg: T) => void)[] = [];
 
