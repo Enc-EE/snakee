@@ -22,12 +22,9 @@ export class GamepadScanner {
     }
 
     private scangamepads = () => {
-        console.log("scanning gamepads");
-
         var gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
         for (var i = 0; i < gamepads.length; i++) {
             if (gamepads[i]) {
-                console.log("scanned gamepad: " + gamepads[i].index + "/" + gamepads[i].id);
                 if (!(gamepads[i].index in this.gamepads) && gamepads[i].buttons.length >= 16) {
                     this.gamepads[gamepads[i].index] = gamepads[i];
                     this.scannedGamepad.dispatchEvent(gamepads[i]);

@@ -34,6 +34,30 @@ export class GamepadControls implements Controller {
         return gp.buttons[0].pressed;
     }
 
+    public get up(): boolean {
+        var gamepads = navigator.getGamepads();
+        var gp = gamepads[this.index];
+        return gp.buttons[12].pressed;
+    }
+
+    public get right(): boolean {
+        var gamepads = navigator.getGamepads();
+        var gp = gamepads[this.index];
+        return gp.buttons[15].pressed;
+    }
+
+    public get down(): boolean {
+        var gamepads = navigator.getGamepads();
+        var gp = gamepads[this.index];
+        return gp.buttons[13].pressed;
+    }
+
+    public get left(): boolean {
+        var gamepads = navigator.getGamepads();
+        var gp = gamepads[this.index];
+        return gp.buttons[14].pressed;
+    }
+
     public enableSignals() {
         this.signalListener();
     }
@@ -48,6 +72,10 @@ export class GamepadControls implements Controller {
 
         this.checkSignal(this.start, Signals.start, now);
         this.checkSignal(this.a, Signals.a, now);
+        this.checkSignal(this.up, Signals.up, now);
+        this.checkSignal(this.right, Signals.right, now);
+        this.checkSignal(this.left, Signals.left, now);
+        this.checkSignal(this.down, Signals.down, now);
         this.checkSignal(this.yAxes < -0.5, Signals.up, now);
         this.checkSignal(this.yAxes > 0.5, Signals.down, now);
         this.checkSignal(this.xAxes < -0.5, Signals.left, now);

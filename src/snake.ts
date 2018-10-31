@@ -12,15 +12,15 @@ enum Direction {
 export class Snake implements Animatable {
 
     public parts: { x: number, y: number }[] = [];
-    private points: number;
+    public points: number;
 
     private direction: Direction;
     private nextDirection: Direction
     private color: string;
     public iMDone: EEvent;
     public collected: EEventT<number>;
-    private isDone: boolean;
-
+    public isDone: boolean;
+    private addPart: boolean;
 
     public get headPart(): { x: number, y: number } {
         return this.parts[this.parts.length - 1];
@@ -28,7 +28,7 @@ export class Snake implements Animatable {
 
 
 
-    constructor(private fieldSize: number, private controller: Controller, private playerNumber: number) {
+    constructor(private fieldSize: number, private controller: Controller, public playerNumber: number) {
         this.direction = Direction.right;
         this.points = 0;
         this.nextDirection = this.direction;
@@ -45,8 +45,10 @@ export class Snake implements Animatable {
         this.iMDone.addEventListener(this.finish)
     }
 
+
     private collectedSomething = (weight: number) => {
         this.points += weight * 2;
+        this.addPart = true;
     };
 
     private finish = () => {
@@ -96,7 +98,11 @@ export class Snake implements Animatable {
                     this.parts.push({ x: current.x - 1, y: current.y })
                     break;
             }
-            this.parts.shift();
+            if (!this.addPart) {
+                this.parts.shift();
+            } else {
+                this.addPart = false;
+            }
         }
     }
 

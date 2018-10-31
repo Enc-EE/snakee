@@ -1,6 +1,8 @@
 import { View } from "./enc/view";
-import { Controller } from "./enc/controller";
+import { Controller, Signals } from "./enc/controller";
 import { Snake } from "./snake";
+import death from "./assets/skull-and-crossbones.png";
+import { EEvent } from "./enc/eEvent";
 
 export class GameView extends View {
     private snakes: Snake[] = [];
@@ -14,25 +16,100 @@ export class GameView extends View {
     itemSpawnerDelay: number;
     currentItemSpawnDelay: number;
     maxItems: number;
+    numberOfPlayers: number;
+    gameFinished: boolean;
+    deathImage: any;
+    private allowNewGame: boolean;
+    public requestNewGame: EEvent;
 
-    public start(controllers: Controller[]) {
+    constructor(private controllers: Controller[]) {
+        super();
+        this.requestNewGame = new EEvent();
+    }
+
+    public start() {
+        this.deathImage = new Image();
+        this.deathImage.src = death;
         this.fieldSize = 1;
         this.itemSpawnerDelay = 5;
         this.currentItemSpawnDelay = this.itemSpawnerDelay;
         this.maxItems = 3;
-        for (let i = 0; i < controllers.length; i++) {
-            const controller = controllers[i];
-            var snake = new Snake(this.fieldSize, controller, i / controllers.length);
+        for (let i = 0; i < this.controllers.length; i++) {
+            const controller = this.controllers[i];
+            var snake = new Snake(this.fieldSize, controller, i / this.controllers.length);
             this.addAnimatable(snake);
+            snake.iMDone.addEventListener(this.snakeIsDone);
             this.snakes.push(snake);
         }
 
         this.lastFrameTime = Date.now();
         this.addUpdate(this.update);
         this.addAnimation(this.animation);
+
+        for (let i = 0; i < this.controllers.length; i++) {
+            const controller = this.controllers[i];
+
+            controller.signal.addEventListener((sender: Controller, signal: Signals) => {
+                if (this.gameFinished && this.allowNewGame) {
+                    if (signal == Signals.a || signal == Signals.start) {
+                        this.requestNewGame.dispatchEvent();
+                    }
+                }
+            });
+        }
+    }
+
+    private snakeIsDone = () => {
+        let snakesDone = this.snakes.map(s => {
+            return s.isDone;
+        })
+        let snakesAlive = snakesDone.filter(s => s).length;
+        if (snakesAlive == 0 || this.snakes.length > 1 && snakesAlive == 1) {
+            this.gameFinished = true;
+            setTimeout(() => {
+                this.allowNewGame = true;
+            }, 3000);
+            this.snakes = this.snakes.sort((s1, s2) => {
+                return s1.isDone ? s2.points - s1.points : -1;
+            });
+            this.addAnimation((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.8)"
+                ctx.fillRect(0, 0, width, height);
+
+                for (let i = 0; i < this.snakes.length; i++) {
+                    const snake = this.snakes[i];
+                    ctx.textAlign = "center"; // start / left / center / right / end
+                    ctx.textBaseline = "top" // bottom / alphabetic / middle / hanging / top
+                    ctx.fillStyle = "hsl(" + snake.playerNumber * 360 + ",100%, 50%)"
+                    var x = width * snake.playerNumber + width * (1 / this.snakes.length) / 2;
+                    if (snake.isDone) {
+                        let newWidth = width / this.snakes.length / 4;
+                        let newHeight = newWidth / this.deathImage.naturalWidth * this.deathImage.naturalHeight;
+                        ctx.drawImage(this.deathImage, x - newWidth / 2, height / 2 - 80 - newHeight - 20, newWidth, newHeight);
+                    }
+                    ctx.font = "50px sans-serif";
+                    ctx.fillText("Score: " + snake.points.toString(), x, height / 2 - 80)
+                    ctx.font = (60 + (this.snakes.length - i) * 20) + "px sans-serif";
+
+                    ctx.fillStyle = "hsl(" + snake.playerNumber * 360 + ",100%, 50%)"
+                    ctx.fillText((i + 1).toString() + ".", x, height / 2)
+                }
+
+                if (this.allowNewGame) {
+                    ctx.textAlign = "center"; // start / left / center / right / end
+                    ctx.textBaseline = "top" // bottom / alphabetic / middle / hanging / top
+                    ctx.fillStyle = "black"
+                    ctx.font = "50px sans-serif";
+                    ctx.fillText("Press a button to start a new game.", width / 2, height / 4 * 3)
+                }
+            })
+        }
     }
 
     public update = (timeDiff: number) => {
+        if (this.gameFinished) {
+            return;
+        }
         var now = Date.now();
         var elapsed = now - this.lastFrameTime;
 

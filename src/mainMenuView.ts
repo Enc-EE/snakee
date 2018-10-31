@@ -5,6 +5,7 @@ import { GamepadScanner } from "./enc/gamepadScanner";
 import { GamepadControls } from "./enc/gamepadControls";
 import controls_gamepad from "./assets/controls_gamepad.png";
 import controls_keyboard from "./assets/controls_keyboard.png";
+import { EEvent } from "./enc/eEvent";
 
 export class MainMenuView extends View {
     private selectedOption: number;
@@ -16,8 +17,11 @@ export class MainMenuView extends View {
     private showControls: boolean;
     gamepadScanner: GamepadScanner;
 
-    constructor(private start: () => void) {
+    public requestStart: EEvent;
+
+    constructor() {
         super();
+        this.requestStart = new EEvent();
         this.options = ["Start Game", "Show / Hide Controls"];
         this.selectedOption = 0;
         this.showControls = true;
@@ -42,6 +46,8 @@ export class MainMenuView extends View {
 
         this.gamepadScanner = new GamepadScanner();
         this.gamepadScanner.scannedGamepad.addEventListener((gamepad: Gamepad) => {
+            console.log("gamepadScanner");
+            
             this.addController(new GamepadControls(gamepad.index.toString(), gamepad.index));
         });
         this.gamepadScanner.start();
@@ -107,9 +113,9 @@ export class MainMenuView extends View {
     }
 
     private controllerSignal = (sender: Controller, signal: Signals) => {
-        console.log("signal: " + signal);
-
         if (signal == Signals.start) {
+            console.log("signal");
+            
             if (this.controllers.indexOf(sender) >= 0) {
                 this.controllers.splice(this.controllers.indexOf(sender), 1);
             } else {
@@ -133,7 +139,7 @@ export class MainMenuView extends View {
                     switch (this.selectedOption) {
                         case 0:
                             this.gamepadScanner.stop();
-                            this.start();
+                            this.requestStart.dispatchEvent();
                             break;
                         case 1:
                             this.showControls = !this.showControls;

@@ -10,17 +10,33 @@ export class App {
 
     public run() {
         this.animation = Animation.createInBody();
-        this.menu = new MainMenuView(this.start);
-        this.animation.addView(this.menu);
-        
-        this.game = new GameView();
-        this.animation.addView(this.game);
-        this.game.hide();
+        this.newGame();
     }
-
+    
     private start = () => {
+        console.log("start");
+        
+        this.game = new GameView(this.menu.controllers);
         this.menu.hide();
-        this.game.show();
-        this.game.start(this.menu.controllers);
+        this.menu.requestStart.removeEventListener(this.start);
+        this.menu = null;
+        
+        this.animation.addView(this.game);
+        this.game.requestNewGame.addEventListener(this.newGame);
+        this.game.start();
+    }
+    
+    private newGame = () => {
+        console.log("new");
+        this.menu = new MainMenuView();
+        this.menu.requestStart.addEventListener(this.start);
+        if (this.game) {
+            this.game.requestNewGame.removeEventListener(this.newGame);
+            this.game.hide();
+            this.game = null;
+        }
+        
+        this.animation.addView(this.menu);
+        this.menu.show();
     }
 }
