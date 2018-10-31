@@ -63,47 +63,53 @@ export class GameView extends View {
         let snakesDone = this.snakes.map(s => {
             return s.isDone;
         })
-        let snakesAlive = snakesDone.filter(s => s).length;
-        if (snakesAlive == 0 || this.snakes.length > 1 && snakesAlive == 1) {
-            this.gameFinished = true;
-            setTimeout(() => {
-                this.allowNewGame = true;
-            }, 3000);
-            this.snakes = this.snakes.sort((s1, s2) => {
-                return s1.isDone ? s2.points - s1.points : -1;
-            });
-            this.addAnimation((ctx: CanvasRenderingContext2D, width: number, height: number) => {
-                ctx.fillStyle = "rgba(255, 255, 255, 0.8)"
-                ctx.fillRect(0, 0, width, height);
 
-                for (let i = 0; i < this.snakes.length; i++) {
-                    const snake = this.snakes[i];
-                    ctx.textAlign = "center"; // start / left / center / right / end
-                    ctx.textBaseline = "top" // bottom / alphabetic / middle / hanging / top
-                    ctx.fillStyle = "hsl(" + snake.playerNumber * 360 + ",100%, 50%)"
-                    var x = width * snake.playerNumber + width * (1 / this.snakes.length) / 2;
-                    if (snake.isDone) {
-                        let newWidth = width / this.snakes.length / 4;
-                        let newHeight = newWidth / this.deathImage.naturalWidth * this.deathImage.naturalHeight;
-                        ctx.drawImage(this.deathImage, x - newWidth / 2, height / 2 - 80 - newHeight - 20, newWidth, newHeight);
-                    }
-                    ctx.font = "50px sans-serif";
-                    ctx.fillText("Score: " + snake.points.toString(), x, height / 2 - 80)
-                    ctx.font = (60 + (this.snakes.length - i) * 20) + "px sans-serif";
-
-                    ctx.fillStyle = "hsl(" + snake.playerNumber * 360 + ",100%, 50%)"
-                    ctx.fillText((i + 1).toString() + ".", x, height / 2)
-                }
-
-                if (this.allowNewGame) {
-                    ctx.textAlign = "center"; // start / left / center / right / end
-                    ctx.textBaseline = "top" // bottom / alphabetic / middle / hanging / top
-                    ctx.fillStyle = "black"
-                    ctx.font = "50px sans-serif";
-                    ctx.fillText("Press a button to start a new game.", width / 2, height / 4 * 3)
-                }
-            })
+        let snakesAlive = snakesDone.filter(s => !s).length;
+        if (snakesAlive == 0) {
+            this.gameFinishedMethod();
         }
+    }
+
+    private gameFinishedMethod = () => {
+        this.gameFinished = true;
+        setTimeout(() => {
+            this.allowNewGame = true;
+        }, 3000);
+        this.snakes = this.snakes.sort((s1, s2) => {
+            return s2.points - s1.points;
+        });
+        this.addAnimation((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)"
+            ctx.fillRect(0, 0, width, height);
+
+            for (let i = 0; i < this.snakes.length; i++) {
+                const snake = this.snakes[i];
+                ctx.textAlign = "center"; // start / left / center / right / end
+                ctx.textBaseline = "top" // bottom / alphabetic / middle / hanging / top
+                ctx.fillStyle = "hsl(" + snake.playerNumber * 360 + ",100%, 50%)"
+                var x = width * snake.playerNumber + width * (1 / this.snakes.length) / 2;
+                if (snake.isDone) {
+                    let newWidth = width / this.snakes.length / 4;
+                    let newHeight = newWidth / this.deathImage.naturalWidth * this.deathImage.naturalHeight;
+                    ctx.drawImage(this.deathImage, x - newWidth / 2, height / 2 - 80 - newHeight - 20, newWidth, newHeight);
+                }
+                ctx.font = "50px sans-serif";
+                ctx.fillText("Score: " + snake.points.toString(), x, height / 2 - 80)
+                ctx.font = (60 + (this.snakes.length - i) * 20) + "px sans-serif";
+
+                ctx.fillStyle = "hsl(" + snake.playerNumber * 360 + ",100%, 50%)"
+                ctx.fillText((i + 1).toString() + ".", x, height / 2)
+            }
+
+            if (this.allowNewGame) {
+                ctx.textAlign = "center"; // start / left / center / right / end
+                ctx.textBaseline = "top" // bottom / alphabetic / middle / hanging / top
+                ctx.fillStyle = "black"
+                ctx.font = "50px sans-serif";
+                ctx.fillText("Press a button to start a new game.", width / 2, height / 4 * 3)
+            }
+        })
+
     }
 
     public update = (timeDiff: number) => {
@@ -152,30 +158,50 @@ export class GameView extends View {
             }
             for (let i = 0; i < this.snakes.length; i++) {
                 const snake1 = this.snakes[i];
-                if (snake1.headPart.x < 0 || snake1.headPart.y < 0 || snake1.headPart.x >= this.numberOfBlocksX || snake1.headPart.y >= this.numberOfBlocksY) {
-                    snake1.iMDone.dispatchEvent();
+                if (!snake1.isDone) {
+                    if (snake1.headPart.x < 0 || snake1.headPart.y < 0 || snake1.headPart.x >= this.numberOfBlocksX || snake1.headPart.y >= this.numberOfBlocksY) {
+                        snake1.iMDone.dispatchEvent();
+                    }
+                    for (let j = 0; j < this.snakes.length; j++) {
+                        const snake2 = this.snakes[j];
+                        let length = snake1 != snake2 ? snake2.parts.length : snake2.parts.length - 1;
+                        for (let k = 0; k < length; k++) {
+                            const part = snake2.parts[k];
+                            if (part.x == snake1.headPart.x && part.y == snake1.headPart.y) {
+                                snake1.iMDone.dispatchEvent();
+                            }
+                        }
+                    }
+                    var collectedItemIndices = [];
+                    for (let j = 0; j < this.items.length; j++) {
+                        const item = this.items[j];
+                        if (item.x == snake1.headPart.x && item.y == snake1.headPart.y) {
+                            collectedItemIndices.push(j);
+                            snake1.collected.dispatchEvent(item.weight);
+                        }
+                    }
+                    for (let i = 0; i < collectedItemIndices.length; i++) {
+                        const itemIndex = collectedItemIndices[i];
+                        this.items.splice(itemIndex, 1);
+                    }
                 }
-                for (let j = 0; j < this.snakes.length; j++) {
-                    const snake2 = this.snakes[j];
-                    let length = snake1 != snake2 ? snake2.parts.length : snake2.parts.length - 1;
-                    for (let k = 0; k < length; k++) {
-                        const part = snake2.parts[k];
-                        if (part.x == snake1.headPart.x && part.y == snake1.headPart.y) {
-                            snake1.iMDone.dispatchEvent();
+            }
+
+            var isFirst = true;
+            let snakesAlive = this.snakes.filter(s => !s.isDone);
+
+            if (snakesAlive.length == 1 && this.snakes.length > 1) {
+                for (let i = 0; i < this.snakes.length; i++) {
+                    const snake2 = this.snakes[i];
+                    if (snake2 != snakesAlive[0]) {
+
+                        if (snake2.points >= snakesAlive[0].points) {
+                            isFirst = false;
                         }
                     }
                 }
-                var collectedItemIndices = [];
-                for (let j = 0; j < this.items.length; j++) {
-                    const item = this.items[j];
-                    if (item.x == snake1.headPart.x && item.y == snake1.headPart.y) {
-                        collectedItemIndices.push(j);
-                        snake1.collected.dispatchEvent(item.weight);
-                    }
-                }
-                for (let i = 0; i < collectedItemIndices.length; i++) {
-                    const itemIndex = collectedItemIndices[i];
-                    this.items.splice(itemIndex, 1);
+                if (isFirst) {
+                    this.gameFinishedMethod();
                 }
             }
         }

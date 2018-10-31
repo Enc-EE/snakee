@@ -53,6 +53,7 @@ export class Snake implements Animatable {
 
     private finish = () => {
         this.isDone = true;
+        this.points = this.points - 8;
     }
 
     private controllerSignal = (sender: Controller, signal: Signals) => {

@@ -46,8 +46,6 @@ export class MainMenuView extends View {
 
         this.gamepadScanner = new GamepadScanner();
         this.gamepadScanner.scannedGamepad.addEventListener((gamepad: Gamepad) => {
-            console.log("gamepadScanner");
-            
             this.addController(new GamepadControls(gamepad.index.toString(), gamepad.index));
         });
         this.gamepadScanner.start();
@@ -114,8 +112,6 @@ export class MainMenuView extends View {
 
     private controllerSignal = (sender: Controller, signal: Signals) => {
         if (signal == Signals.start) {
-            console.log("signal");
-            
             if (this.controllers.indexOf(sender) >= 0) {
                 this.controllers.splice(this.controllers.indexOf(sender), 1);
             } else {

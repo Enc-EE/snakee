@@ -14,8 +14,6 @@ export class App {
     }
     
     private start = () => {
-        console.log("start");
-        
         this.game = new GameView(this.menu.controllers);
         this.menu.hide();
         this.menu.requestStart.removeEventListener(this.start);
@@ -27,7 +25,6 @@ export class App {
     }
     
     private newGame = () => {
-        console.log("new");
         this.menu = new MainMenuView();
         this.menu.requestStart.addEventListener(this.start);
         if (this.game) {

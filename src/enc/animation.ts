@@ -41,10 +41,9 @@ export class Animation {
         animation.ctx = canvas.getContext('2d');
 
         document.addEventListener('keyup', (event) => {
-            if (event.keyCode == 80) { // space
+            if (event.keyCode == 80) { // p
                 animation.playPause();
             }
-            console.log(event.keyCode);
         });
 
         animation.startAnimation();
